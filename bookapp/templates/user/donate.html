@@ -1,0 +1,31 @@
+{% extends "user/home_layout.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col col-10">
+        <form class="form" method="POST">
+            <h2>Donation Form: Thank you</h2>
+            <p>Kindly complete the form below with the amount you want to donate.</p>
+            <input type='hidden' name='csrf_token' value={{csrf_token()}}>
+            <div class="mb-3">
+                <label for="fullname">Fullname</label>
+                <input class="form-control" name="fullname" id="fullname" type="text" value='{{deets.user_fullname}}'/>              
+            </div>
+            <div class="mb-3">
+                <label for="email">Email</label>
+                <input class="form-control" name="email" id="email" type="email" value='{{deets.user_email}}'/>
+            </div>
+            <div class="mb-3">
+                <label for="amt">Amount</label>
+                <input class="form-control" name="amt" id="amt" type="text"/>
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-primary" type="submit">Continue</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+{% endblock %}
+{% block patner %}{% endblock %}
+{% block featured %}{% endblock %}

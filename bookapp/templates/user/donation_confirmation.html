@@ -1,0 +1,62 @@
+{% extends "user/home_layout.html" %}
+{% block content %}
+<div class="content" style="background-color: white;padding: 3em;">
+<h2>Confirmation Page</h2>
+<p>Kindly confirm the following details: Take note of the transaction reference</p>
+<div class="mb-3">
+    <label>Donor's Name</label>
+    {{ donation_deets.don_fullname }}
+</div>
+<div class="mb-3">
+    <label>Donor's email</label>
+    {{ donation_deets.don_emial }}
+</div>
+<div class="mb-3">
+    <label>Donor Amount</label>
+    {{ donation_deets.don_amt/100 }}
+</div>
+<div class="mb-3">
+    <label>Trasaction Ref</label>
+    <span class="text-danger bg-warning">{{ donation_deets.don_refno }}</span>
+</div>
+<h5>Javascript Method - Pop Up</h5>
+<form id="paymentForm">
+    <div class="mb-3">
+        <a href="/dashboard" class="btn btn-warning noround">Cancel Payment</a>
+        <button class="btn btn-dark noround" type="button" onclick="payWithPaystack(event)">Confirm Payment (Popup)</button>
+    </div>
+</form>
+
+<hr><hr>
+{{session['trxno']}}
+<h5>Redirect Method</h5>
+<a class='btn btn-success noround' href='/initialize/paystack/'>Make Payment Now</a>
+</div>
+{% endblock %}
+
+{% block customjs %}
+<script src="https://js.paystack.co/v1/inline.js"></script>
+<script>
+    const paymentForm = document.getElementById('paymentForm');
+paymentForm.addEventListener("submit", payWithPaystack, false);
+
+function payWithPaystack(e) {
+  e.preventDefault();
+  let handler = PaystackPop.setup({
+    key: 'pk_test_967be1f9d2cee0188245d39b20679a6da03fd4a8', // Replace with your public key
+    email:"{{donation_deets.don_email}}" ,
+    amount: "{{donation_deets.don_amt}}",
+    ref: "{{donation_deets.don_refno}}", // generates a pseudo-unique reference. Please replace with a reference you generated. Or remove the line entirely so our API will generate one for you
+    // label: "Optional string that replaces customer email"
+    onClose: function(){
+      alert('Window closed.');
+    },
+    callback: function(response){
+      let message = 'Payment complete! Reference: ' + response.reference;
+      alert(message);
+    }
+  });
+  handler.openIframe();
+}
+</script>
+{%endblock%}

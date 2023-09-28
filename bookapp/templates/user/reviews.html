@@ -1,0 +1,97 @@
+{% extends "user/home_layout.html" %}
+
+{% block partner %}
+<!-- We want it empty to overide the default in home_layout.html -->
+{% endblock partner %}
+
+{% block featured %}
+<!-- We want it empty to overide the default in home_layout.html -->
+{% endblock featured %}
+
+{% block customcss %} style="background-color:white";{% endblock customcss %}
+
+
+{% block content %}
+   <div class="content">
+    
+
+
+    <div class="row g-5"> 
+    <div class="col-md-4">
+      <div class="position-sticky" style="top: 2rem;">
+      <img src="/static/uploads/{{book.book_cover}}" class="img-fluid"  style="max-height:500px">
+      </div>
+    </div> 
+
+    <div class="col-md-8">
+      <h3 class="pb-4 mb-4 fst-italic border-bottom">
+       Book Title
+      </h3>
+      {% if book.bookreviews|count > 0 %}
+      {% for r in book.bookreviews %}
+      <article class="blog-post">
+        <h5 class="blog-post-title">{{r.rev_title}}</h5>
+        <p class="blog-post-meta">{{ r.rev_date }}<a href="#">{{ r.reviewby.user_fullname }}</a></p>
+
+        <p>{{ r.rev_text }}</p>
+        <hr> 
+      </article>
+      {% endfor %}
+
+      {% else %}
+      <div class="alert alert-info" id="noreview"> No rewiew found on this book </div>
+      {% endif %}
+
+      
+      {% if session.get('userloggedin') != None%}
+      <article>
+        <div id="feedback"></div>
+      <form>
+        <div class="mb-3 row">
+          <input type="hidden" id="bookid" name="bookid" value="{{ book.book_id }}"/>
+          <label class="col-md-3">Title</label>
+          <div class="col-md-9">
+            <input type="text" id="title" class="form-control border-info">
+          </div>
+        </div>
+         <div class="mb-3 row">
+          <label class="col-md-3">Review</label>
+          <div class="col-md-9">
+             <textarea name="" id="content" class="form-control border-info"></textarea>
+          </div>
+        </div>
+         <div class="mb-3 row">
+           <button id="btn" class="btn btn-danger noround btn-lg">Submit Review</button>
+         </div>
+      </form> 
+      {% else %}
+      <div class="alert alert-info"><a href="/login" class="alert-link">Login</a> to Review</div>
+      </article>
+      {% endif %}
+      
+
+
+    </div>
+   </div>
+   </div>
+{% endblock content %}
+{% block customjs %}
+   <script type="text/javascript">
+      $(document).ready(function(){
+        $('#btn').click(function(event){
+            event.preventDefault();
+            //make ajax call using the $.post method
+            var title = $("#title").val()
+            var content = $("#content").val()
+            var csrf = "{{csrf_token()}}"
+            var bookid = $("#bookid").val()
+
+            var data2send = {"title":title, "content":content, "csrf_token":csrf, "book":bookid}
+            $.post("/submit_review/",data2send,function(serverRsp){
+              $("#feedback").append(serverRsp)
+              $("#noreview").hide()//The div that says no review found
+            })
+        })
+      })
+   </script>
+{% endblock %}
